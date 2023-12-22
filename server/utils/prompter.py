@@ -1,6 +1,7 @@
 import json
 import os.path as osp
 from typing import Union
+import re
 
 class Prompter(object):
     __slots__ = ("template")
@@ -39,10 +40,54 @@ class Prompter(object):
         else:
             return output
         
-if __name__=="__main__":
-    prompter = Prompter()
-    txt = prompter.generate_prompt(
-        instruction="respond to this tweet with agreement",
-        label="Haha iya dong! Pertumbuhan ekonomi tuh kayak kenceng banget, semoga bisa bikin Indonesia jadi negara super kaya deh!"
-    )
-    print(txt)
+class PrompterLlama(object):
+    _slots_ = ("template")
+
+    def __init__(self, template_name: str = "", verbose: bool = False):
+        self.template = {
+            "description": "Template used by Alpaca-LoRA.",
+            "prompt_input": "<s>[INST] <<SYS>> {sys_text} <</SYS>> {input} [/INST]",
+            "response_split": "[/INST]"}
+
+    def generate_prompt(
+        self,
+        conversation: list[str],
+        sys_text: str,
+        label: Union[None, str] = None
+    ) -> str:
+        res = self.template["prompt_input"].format(sys_text=sys_text,input=conversation[0])
+        conversation=conversation[1:]
+        for i in range(len(conversation)):
+            if i % 2 == 1:  # assistant's message
+                res += f"[INST] {conversation[i]} [/INST]"
+            else:  # user's message
+                res += f" {conversation[i]} "
+        if label:
+            res = f"{res}\n{label}"
+        return res+' </s>'
+    
+    def get_response(self, output: str) -> str:
+        parts = output.split(self.template["response_split"])
+        if len(parts) > 1:
+            return parts[1].strip()
+        else:
+            return output
+
+class PrompterQwen(object):
+    _slots_ = ("template")
+
+    def __init__(self, template_name: str = "", verbose: bool = False):
+        self.template = {
+            "description": "Template used for QWEN.",
+            "response_split": "<|im_start|>"}
+        
+    def get_response(self, output: str) -> str:
+        if output.startswith('!<|im_start|>system') or output.startswith('<|im_start|>system'):
+            return ""
+        parts = re.split(r'<\|im_start\|>(?:user|assistant)', output, flags=re.IGNORECASE)
+        if len(parts) > 1:
+            response_raw=parts[1].strip()
+            response = response_raw.split("<|im_end|>")[0].strip()
+            return response
+        else:
+            return output

@@ -1,5 +1,5 @@
 import torch
-from server.utils.prompter import Prompter
+from server.utils.prompter import Prompter,PrompterLlama,PrompterQwen
 from pydantic import BaseModel
 from typing import Optional,List
 from vllm import LLM,SamplingParams
@@ -19,7 +19,7 @@ class Pipeline(object):
 
     def __init__(self, model_path=None):
         self.model_path = model_path
-        self.prompter = Prompter()
+        self.prompter = PrompterQwen()
         
         print("Loading model's weights ...")
         self.load_model()
@@ -27,14 +27,15 @@ class Pipeline(object):
     def load_model(self):
         self.llm = LLM(self.model_path, 
                        tensor_parallel_size=1,
-                       gpu_memory_utilization=0.9
+                       gpu_memory_utilization=0.9,
+                       trust_remote_code=True
                     #    ,max_num_seqs=1280
                        )
 
     def generate(self,prompts,temperature=0.9,top_p=0.5,top_k=40,presence_penalty=0,frequency_penalty=0):
         outputs = self.llm.generate(
             prompts,
-            sampling_params=SamplingParams(temperature=temperature, top_p=top_p,top_k=top_k,max_tokens=128,presence_penalty=presence_penalty,frequency_penalty=frequency_penalty)
+            sampling_params=SamplingParams(temperature=temperature, top_p=top_p,top_k=top_k,max_tokens=64,presence_penalty=presence_penalty,frequency_penalty=frequency_penalty)
         )
         responses=[]
         for prompt, output in zip(prompts, outputs):
