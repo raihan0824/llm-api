@@ -5,6 +5,7 @@ from typing import Optional,List
 from vllm import LLM,SamplingParams
 from multiprocessing import Process, Queue
 import os
+import random
 
 class Item(BaseModel):
     prompts: List[str]
@@ -35,8 +36,13 @@ class Pipeline(object):
     def generate(self,prompts,temperature=0.9,top_p=0.5,top_k=40,presence_penalty=0,frequency_penalty=0):
         outputs = self.llm.generate(
             prompts,
-            sampling_params=SamplingParams(temperature=temperature, top_p=top_p,top_k=top_k,max_tokens=64,presence_penalty=presence_penalty,frequency_penalty=frequency_penalty)
-        )
+            sampling_params=SamplingParams(temperature=temperature, 
+                                           top_p=top_p,top_k=top_k,
+                                           max_tokens=64,
+                                           presence_penalty=presence_penalty,
+                                           frequency_penalty=frequency_penalty,
+                                           seed=int(random.randint(0, 1000000)))
+                                            )
         responses=[]
         for prompt, output in zip(prompts, outputs):
             generated_text = output.outputs[0].text
