@@ -6,6 +6,9 @@ from vllm import LLM,SamplingParams
 from multiprocessing import Process, Queue
 import os
 import random
+import torch.multiprocessing as mp
+# if mp.get_start_method(allow_none=True) != 'spawn':
+#     mp.set_start_method('spawn', force=True)
 
 class Item(BaseModel):
     prompts: List[str]
@@ -28,7 +31,8 @@ class Pipeline(object):
     def load_model(self):
         self.llm = LLM(self.model_path, 
                        tensor_parallel_size=1,
-                       gpu_memory_utilization=0.9,
+                       gpu_memory_utilization=0.95,
+                    #    max_model_len=8000,
                        trust_remote_code=True
                     #    ,max_num_seqs=1280
                        )
@@ -41,8 +45,10 @@ class Pipeline(object):
                                            max_tokens=64,
                                            presence_penalty=presence_penalty,
                                            frequency_penalty=frequency_penalty,
-                                           seed=int(random.randint(0, 1000000)))
-                                            )
+                                           skip_special_tokens=False
+                                        #    seed=int(random.randint(0, 1000000))
+                                           )
+                                    )
         responses=[]
         for prompt, output in zip(prompts, outputs):
             generated_text = output.outputs[0].text

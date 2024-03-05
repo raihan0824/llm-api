@@ -82,7 +82,7 @@ class PrompterQwen(object):
             "response_split": "<|im_start|>"}
         
     def get_response(self, output: str) -> str:
-        if output.startswith('!<|im_start|>system') or output.startswith('<|im_start|>system'):
+        if output.startswith('!<|im_start|>system') or output.startswith('<|im_start|>system') or output.startswith('<|endoftext|>'):
             return ""
         parts = re.split(r'<\|im_start\|>(?:user|assistant)', output, flags=re.IGNORECASE)
         if len(parts) > 1:

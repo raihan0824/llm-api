@@ -11,3 +11,12 @@ psycopg2-binary
 python-dotenv
 uvicorn
 tenacity
+packaging
+torch == 2.0.1
+transformers == 4.35.0
+psutil
+xformers
+tiktoken
+ray >= 2.5.1
+pyarrow  # Required for Ray data.
+vllm==0.2.7

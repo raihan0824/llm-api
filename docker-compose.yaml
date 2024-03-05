@@ -1,0 +1,13 @@
+version: '3.3'
+services:
+  llm-api:
+    container_name: llm-api
+    build: ./
+    restart: always
+    environment:
+      - NUM_GPU=${NUM_GPU}
+      - MODEL_PATH=${MODEL_PATH}
+    ports:
+      - ${PORT}:5001
+    volumes:
+      - /models:/opt/app/llm-api/models

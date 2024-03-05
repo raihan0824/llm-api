@@ -7,15 +7,6 @@ from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor
 from typing import List
 from math import ceil
-import argparse
-
-# Create the parser
-parser = argparse.ArgumentParser(description="Process some integers.")
-
-# Add the arguments
-parser.add_argument('--num_gpu', type=int, default=8, help='The number of GPUs')
-
-args = parser.parse_args()
 
 
 load_dotenv()
@@ -29,10 +20,11 @@ class Item(BaseModel):
     frequency_penalty: Optional[float] = 0
     presence_penalty: Optional[float] = 0
 
-model_path_bloom = "../trl-llama/models/bloom/bloom_synthetic_40k_v2"
+# model_path = "../trl-llama/models/qwen/qwen_chat_v3"
+model_path = os.getenv("MODEL_PATH")
 
-# pipelines = [PipelineProcess(model_path_bloom, i) for i in range(int(os.getenv("NUM_GPUS","8")))]
-pipelines = [PipelineProcess(model_path_bloom, i) for i in range(args.num_gpu)]
+pipelines = [PipelineProcess(model_path, i) for i in range(int(os.getenv("NUM_GPU","8")))]
+# pipelines = [PipelineProcess(model_path_bloom, i) for i in range(args.num_gpu)]
 # pipelines = [PipelineProcess(model_path_bloom, i) for i in range(4,8)]
 # pipelines = [PipelineProcess(model_path_bloom, i) for i in range(4)] + [PipelineProcess("../trl-llama/models/rlhf/v3/v3step_620_merged", i) for i in range(4,8)]
 

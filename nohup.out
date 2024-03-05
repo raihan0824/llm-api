@@ -1,0 +1,2 @@
+usage: main.py [-h] [--num_gpu NUM_GPU]
+main.py: error: unrecognized arguments: 8logs/inference.log
