@@ -47,31 +47,10 @@ class PrompterLlama(object):
         self.template = {
             "description": "Template used by Alpaca-LoRA.",
             "prompt_input": "<s>[INST] <<SYS>> {sys_text} <</SYS>> {input} [/INST]",
-            "response_split": "[/INST]"}
-
-    def generate_prompt(
-        self,
-        conversation: list[str],
-        sys_text: str,
-        label: Union[None, str] = None
-    ) -> str:
-        res = self.template["prompt_input"].format(sys_text=sys_text,input=conversation[0])
-        conversation=conversation[1:]
-        for i in range(len(conversation)):
-            if i % 2 == 1:  # assistant's message
-                res += f"[INST] {conversation[i]} [/INST]"
-            else:  # user's message
-                res += f" {conversation[i]} "
-        if label:
-            res = f"{res}\n{label}"
-        return res+' </s>'
+            "response_split": "<|eot_id|>"}
     
     def get_response(self, output: str) -> str:
-        parts = output.split(self.template["response_split"])
-        if len(parts) > 1:
-            return parts[1].strip()
-        else:
-            return output
+        return output.split(self.template['response_split'])[0]
 
 class PrompterQwen(object):
     _slots_ = ("template")
