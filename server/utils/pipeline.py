@@ -23,8 +23,12 @@ class Pipeline(object):
 
     def __init__(self, model_path=None):
         self.model_path = model_path
-        self.prompter = PrompterQwen()
-        
+        if "qwen" in model_path.lower():
+            self.prompter = PrompterQwen()
+        elif "llama" in model_path.lower():
+            self.prompter = PrompterLlama()
+        else:
+            self.prompter = Prompter()  # Default prompter if no specific model is matched        
         print("Loading model's weights ...")
         self.load_model()
 
@@ -54,7 +58,6 @@ class Pipeline(object):
             generated_text = output.outputs[0].text
             response = self.prompter.get_response(generated_text)
             responses.append(response)
-            # print((prompt, response))
         torch.cuda.empty_cache()
         return responses
     
