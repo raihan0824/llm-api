@@ -1,23 +1,8 @@
 import torch
 from server.utils.prompter import Prompter,PrompterLlama,PrompterQwen
-from pydantic import BaseModel
-from typing import Optional,List
 from vllm import LLM,SamplingParams
 from multiprocessing import Process, Queue
 import os
-import random
-import torch.multiprocessing as mp
-# if mp.get_start_method(allow_none=True) != 'spawn':
-#     mp.set_start_method('spawn', force=True)
-
-class Item(BaseModel):
-    prompts: List[str]
-    model: str
-    temperature: Optional[float] = 0.9
-    top_p: Optional[float] = 0.5
-    top_k: Optional[int] = 40
-    frequency_penalty: Optional[float] = 0
-    presence_penalty: Optional[float] = 0
 
 class Pipeline(object):
 

@@ -19,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(main_services.generation_router)
+app.include_router(main_services.general_router)
 
 @app.get('/')
 def ping():
@@ -52,7 +53,7 @@ if __name__ == '__main__':
     logging.getLogger('').addHandler(handler)
     logging.getLogger('').setLevel(logging.INFO)
 
-    logger = logging.getLogger('VE-Twitter')
+    logger = logging.getLogger('LLM-API')
     
     logger.info(f"{os.getenv('service_name','development')} service started")
     logger.info(f"host: {os.getenv('HOST','0.0.0.0')}:{os.getenv('PORT','5000')}")
